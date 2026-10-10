@@ -1,0 +1,738 @@
+﻿{
+    "info": {
+        "_postman_id": "oms-api",
+        "name": "Order Management API",
+        "description": "Complete API collection for the Order Management System with authentication, products, orders, and inventory management.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "product_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "order_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "inventory_id",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"access_token\", jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"role_id\": 3,\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"123 Main St, City, Country\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "description": "Register a new user. Role IDs: 1=Admin, 2=Vendor, 3=Customer"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"role_id\": 3,\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/register",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "register"]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"User registered successfully\",\n    \"data\": {\n        \"user\": {\n            \"id\": 1,\n            \"name\": \"John Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"role_id\": 3\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGc...\",\n        \"token_type\": \"bearer\",\n        \"expires_in\": 3600\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"access_token\", jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login with email and password. Default credentials:\n- Admin: admin@example.com / password\n- Vendor: vendor1@example.com / password\n- Customer: customer1@example.com / password"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/login",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "login"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"user\": {\n            \"id\": 1,\n            \"name\": \"Admin User\",\n            \"email\": \"admin@example.com\",\n            \"role_id\": 1\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGc...\",\n        \"token_type\": \"bearer\",\n        \"expires_in\": 3600\n    }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/me",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "me"]
+                        },
+                        "description": "Get authenticated user details"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"access_token\", jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "refresh"]
+                        },
+                        "description": "Refresh JWT access token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout"]
+                        },
+                        "description": "Logout and invalidate token"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "List Products",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/products?page=1&per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["products"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "laptop",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Get paginated list of products. Optional search parameter for full-text search."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Product Details",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["products", "{{product_id}}"]
+                        },
+                        "description": "Get detailed information about a specific product including variants and inventory"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"product_id\", jsonData.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Premium Laptop\",\n    \"description\": \"High-performance laptop with latest specs\",\n    \"price\": 1299.99,\n    \"sku\": \"LAPTOP-2024-001\",\n    \"quantity\": 50\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/products",
+                            "host": ["{{base_url}}"],
+                            "path": ["products"]
+                        },
+                        "description": "Create a new product (Admin/Vendor only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Product",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Premium Laptop - Updated\",\n    \"description\": \"High-performance laptop with latest specs - Now with extended warranty\",\n    \"price\": 1199.99,\n    \"sku\": \"LAPTOP-2024-001\",\n    \"quantity\": 45\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["products", "{{product_id}}"]
+                        },
+                        "description": "Update existing product (Admin/Vendor only, vendors can only update their own products)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Product",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/products/{{product_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["products", "{{product_id}}"]
+                        },
+                        "description": "Delete product (Admin/Vendor only, vendors can only delete their own products)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Import Products (CSV)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "/path/to/products.csv"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/products/import",
+                            "host": ["{{base_url}}"],
+                            "path": ["products", "import"]
+                        },
+                        "description": "Bulk import products from CSV file (Admin/Vendor only)\n\nCSV Format:\nname,description,price,sku,quantity\nProduct 1,Description 1,99.99,SKU001,100"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "List Orders",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/orders?page=1&per_page=15",
+                            "host": ["{{base_url}}"],
+                            "path": ["orders"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Get orders (Customers see their own, Vendors see orders with their products, Admins see all)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Order Details",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/orders/{{order_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["orders", "{{order_id}}"]
+                        },
+                        "description": "Get detailed order information including items and customer details"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Order",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"order_id\", jsonData.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"items\": [\n        {\n            \"product_id\": 1,\n            \"quantity\": 2,\n            \"price\": 99.99\n        },\n        {\n            \"product_id\": 2,\n            \"quantity\": 1,\n            \"price\": 149.99\n        }\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["orders"]
+                        },
+                        "description": "Create a new order (Customer only). Automatically reserves inventory and triggers order confirmation email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Order Status",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"processing\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/orders/{{order_id}}/status",
+                            "host": ["{{base_url}}"],
+                            "path": ["orders", "{{order_id}}", "status"]
+                        },
+                        "description": "Update order status (Admin/Vendor only)\n\nValid statuses: pending, processing, shipped, delivered, cancelled"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cancel Order",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/orders/{{order_id}}/cancel",
+                            "host": ["{{base_url}}"],
+                            "path": ["orders", "{{order_id}}", "cancel"]
+                        },
+                        "description": "Cancel an order and restore inventory. Only pending or processing orders can be cancelled."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Inventory",
+            "item": [
+                {
+                    "name": "Get Inventory",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/inventory/{{inventory_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["inventory", "{{inventory_id}}"]
+                        },
+                        "description": "Get inventory details for a product (Admin/Vendor only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Inventory",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"quantity\": 100,\n    \"reserved_quantity\": 5\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/inventory/{{inventory_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["inventory", "{{inventory_id}}"]
+                        },
+                        "description": "Update inventory quantities (Admin/Vendor only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Low Stock Items",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/inventory/low-stock/list?threshold=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["inventory", "low-stock", "list"],
+                            "query": [
+                                {
+                                    "key": "threshold",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Get list of products with low stock (Admin/Vendor only)"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
